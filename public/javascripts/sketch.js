@@ -1,14 +1,20 @@
 Sketch = function(opts) {
 	this.el = document.querySelector(opts.container);
+	this.cache = {};
+	this.cache.canvas = document.createElement('canvas');
+	this.cache.ctx = this.cache.canvas.getContext('2d');
 	this.ctx	   = this.el.getContext('2d');
 	this.mouseX = new Array;
 	this.mouseY = new Array;
 	this.colors = new Array;
 	this.isDrawing = false;
 	this.newPath = true;
+	this.lastX;
+	this.lastY;
 	this.events = {
 		'mousedown' : 'startDrawing',
 		'mouseup'	: 'stopDrawing',
+		'mouseleave': 'stopDrawing',
 		'mousemove' : 'addPoint'
 	}
 	/*
@@ -25,6 +31,7 @@ Sketch = function(opts) {
 	 */
 	this.startDrawing = function(e) {
 		this.isDrawing = true;
+		this.addPoint(e);
 	}
 	/*
 	 * stopDrawing - toggles drawing state to false
@@ -39,9 +46,19 @@ Sketch = function(opts) {
 	this.addPoint = function(e) {
 		var rect = this.el.getBoundingClientRect();
 		if(this.isDrawing){
-			this.mouseX.push(e.clientX - rect.left);
-			this.mouseY.push(e.clientY - rect.top);
-			this.redraw();
+			x = e.clientX - rect.left;
+			y = e.clientY - rect.top;
+			this.mouseX.push(x);
+			this.mouseY.push(y);
+			ctx = this.ctx;
+			ctx.strokeStyle = '#df4b26';
+			ctx.lineJoin = 'round';
+			ctx.lineWidth = 15;
+			ctx.beginPath();
+			ctx.moveTo(x-1, y);
+			ctx.lineTo(x, y);
+			ctx.closePath();
+			ctx.stroke();
 		}
 	}
 	/*
@@ -53,7 +70,7 @@ Sketch = function(opts) {
 		ctx = this.ctx;
 		ctx.strokeStyle = '#df4b26';
 		ctx.lineJoin = 'round';
-		ctx.lineWidth = 5;
+		ctx.lineWidth = 15;
 		ctx.beginPath();
 		this.mouseX.forEach(function(val,key){
 			if(self.newPath){
