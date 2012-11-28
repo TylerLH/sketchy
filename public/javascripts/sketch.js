@@ -14,7 +14,7 @@ Sketch = function(opts) {
 	this.events = {
 		'mousedown' : 'startDrawing',
 		'mouseup'	: 'stopDrawing',
-		'mouseleave': 'stopDrawing',
+		'mouseout': 'stopDrawing',
 		'mousemove' : 'addPoint'
 	}
 	/*
@@ -22,6 +22,9 @@ Sketch = function(opts) {
 	 */
 	this.attachEvents = function() {
 		self = this;
+		this.el.oncontextmenu = function() {
+			return false;
+		}
 		Object.keys(this.events).forEach(function(e){
 			self.el.addEventListener(e, self[self.events[e]].bind(self));
 		});
@@ -44,6 +47,8 @@ Sketch = function(opts) {
 	 * addPoint - adds a new point to the canvas and joins the line if currently drawing
 	 */
 	this.addPoint = function(e) {
+		e.preventDefault();
+		e.stopPropagation();
 		var rect = this.el.getBoundingClientRect();
 		if(this.isDrawing){
 			x = e.clientX - rect.left;
@@ -53,7 +58,7 @@ Sketch = function(opts) {
 			ctx = this.ctx;
 			ctx.strokeStyle = '#df4b26';
 			ctx.lineJoin = 'round';
-			ctx.lineWidth = 15;
+			ctx.lineWidth = 2;
 			ctx.beginPath();
 			ctx.moveTo(x-1, y);
 			ctx.lineTo(x, y);
@@ -84,8 +89,8 @@ Sketch = function(opts) {
 		});
 	}
  	this.init = function() {
- 		this.el.width = screen.width * 0.8;
- 		this.el.height = screen.height * 0.6;
+ 		this.el.width = document.width * 0.8;
+ 		this.el.height = document.height;
 		this.attachEvents();
 	}
 	this.init();
